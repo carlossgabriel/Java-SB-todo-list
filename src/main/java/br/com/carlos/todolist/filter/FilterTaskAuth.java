@@ -3,18 +3,14 @@ package br.com.carlos.todolist.filter;
 import java.io.IOException;
 import java.util.Base64;
 
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import br.com.carlos.todolist.user.IUserRepository;
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -30,24 +26,19 @@ public class FilterTaskAuth extends OncePerRequestFilter {
 
     var servletPath = request.getServletPath();
 
-    if (servletPath.contains("/tasks/")) {
-
+    if (servletPath.startsWith("/tasks/")) {
       var authorization = request.getHeader("Authorization");
-
       if (authorization == null) {
         response.sendError(401, "Unauthorized");
         return;
       }
 
       var basicToken = authorization.substring("Basic".length()).trim();
-
       byte[] authDecoded = Base64.getDecoder().decode(basicToken);
 
       var auth = new String(authDecoded).split(":");
-
       var username = auth[0];
       String password = auth[1];
-
       var user = this.userRepository.findByUsername(username);
 
       if (user == null) {
@@ -55,9 +46,8 @@ public class FilterTaskAuth extends OncePerRequestFilter {
         return;
       } else {
         var passwordVerified = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
-
         if (passwordVerified.verified) {
-
+          request.setAttribute("idUser", user.getId());
           filterChain.doFilter(request, response);
         } else {
           response.sendError(401, "Unauthorized");
@@ -66,7 +56,5 @@ public class FilterTaskAuth extends OncePerRequestFilter {
     } else {
       filterChain.doFilter(request, response);
     }
-
   }
-
 }

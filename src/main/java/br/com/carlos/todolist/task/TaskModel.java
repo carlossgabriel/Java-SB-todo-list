@@ -8,13 +8,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
-import br.com.carlos.todolist.user.UserModel;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data
@@ -37,8 +34,6 @@ public class TaskModel {
   private Boolean completed;
 
   @CreatedBy
-  // @ManyToOne(targetEntity = UserModel.class, cascade = { CascadeType.PERSIST },
-  // optional = false)
   private UUID createdBy;
 
   @LastModifiedBy
