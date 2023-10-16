@@ -77,10 +77,14 @@ public class TaskController {
       return ResponseEntity.status(404).body("Task not found");
     }
 
+    if (task.getCreatedBy() != request.getAttribute("idUser")) {
+      return ResponseEntity.status(401).body("Unauthorized");
+    }
+
     Utils.copyNonNullProperties(taskModel, task);
 
-    this.taskRepository.save(taskModel);
+    var updatedTask = this.taskRepository.save(taskModel);
 
-    return ResponseEntity.status(200).body(task);
+    return ResponseEntity.status(200).body(updatedTask);
   }
 }
